@@ -1,4 +1,3 @@
-/* 1. Box-sizing 전역 초기화 */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -9,6 +8,7 @@
 :root {
   --bg-color: #f7f8fa;
   --card-bg: #ffffff;
+  --item-bg: #f9fafb;
   --text-main: #1f2937;
   --text-sub: #6b7280;
   --border-color: #e5e7eb;
@@ -29,6 +29,7 @@
 [data-theme="dark"] {
   --bg-color: #111318;
   --card-bg: #1a1e26;
+  --item-bg: #222733;
   --text-main: #f3f4f6;
   --text-sub: #9ca3af;
   --border-color: #2b3240;
@@ -56,16 +57,15 @@ body {
   background-color: var(--bg-color);
   color: var(--text-main);
   line-height: 1.5;
-  padding-bottom: 50px;
+  padding-bottom: 60px;
   word-break: keep-all;
   overflow-wrap: break-word;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* 2. 컨테이너 가로폭 제약 해제 */
 .app-container {
   width: 100%;
-  max-width: 480px;
+  max-width: 440px; /* Z Flip 5 폭 최적화 */
   margin: 0 auto;
   padding: 12px;
 }
@@ -76,9 +76,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 8px 0 12px;
-  gap: 8px;
   width: 100%;
-  min-width: 0;
 }
 
 .brand {
@@ -86,79 +84,33 @@ body {
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  min-width: 0;
 }
 
 .brand-icon {
-  font-size: 1.3rem;
-  flex-shrink: 0;
+  font-size: 1.4rem;
 }
 
 .brand-title {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 800;
   letter-spacing: -0.5px;
-  overflow-wrap: break-word;
-  word-break: keep-all;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  flex-shrink: 0;
-}
-
-.user-badge {
-  display: flex;
-  align-items: center;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 4px 10px;
-  box-shadow: var(--shadow);
-  min-width: 0;
-}
-
-.user-label {
-  font-size: 0.75rem;
-  color: var(--text-sub);
-  margin-right: 6px;
-  white-space: nowrap;
-}
-
-.user-name-input {
-  border: none;
-  background: transparent;
-  color: var(--text-main);
-  font-size: 0.88rem;
-  font-weight: 700;
-  width: 50px;
-  text-align: center;
-  padding: 0;
-  min-width: 0;
-}
-.user-name-input:focus {
-  outline: none;
 }
 
 .icon-btn {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   font-size: 1.1rem;
   cursor: pointer;
   box-shadow: var(--shadow);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
-/* Card */
+/* Card Common */
 .card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -167,43 +119,60 @@ body {
   margin-bottom: 12px;
   box-shadow: var(--shadow);
   width: 100%;
-  max-width: 100%;
   overflow: hidden;
 }
 
-/* Meta Section */
-.meta-section {
+/* Step 제목이 카드 칸 안에 쏙 들어가도록 설계 */
+.step-card-header {
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.step-badge {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  display: block;
+}
+
+/* Meta Section (작성자 + 날짜) */
+.meta-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
   gap: 8px;
   width: 100%;
 }
 
-.date-input-group {
+.meta-col {
+  flex: 1;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
+  flex-direction: column;
+  gap: 4px;
   min-width: 0;
 }
 
-.date-input-group label {
-  font-size: 0.85rem;
+.meta-col label {
+  font-size: 0.78rem;
   font-weight: 700;
+  color: var(--text-sub);
 }
 
-.date-input {
+.meta-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
   border: 1px solid var(--border-color);
   background-color: var(--bg-color);
   color: var(--text-main);
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  width: 105px;
-  min-width: 0;
+  text-align: center;
+}
+
+.status-row {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .status-badge {
@@ -213,10 +182,8 @@ body {
   font-size: 0.72rem;
   color: var(--text-sub);
   background-color: var(--bg-color);
-  padding: 4px 8px;
+  padding: 3px 8px;
   border-radius: 12px;
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .status-dot {
@@ -224,7 +191,6 @@ body {
   height: 6px;
   border-radius: 50%;
   background-color: var(--done-color);
-  flex-shrink: 0;
 }
 
 /* Calendar Section */
@@ -299,7 +265,6 @@ body {
   justify-content: center;
   cursor: pointer;
   margin: 1px;
-  min-width: 0;
 }
 .days div:active { background-color: var(--accent-color); }
 .days div.today { border: 2px solid var(--today-border); font-weight: 800; }
@@ -320,110 +285,163 @@ body {
 }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 
-/* 4. step.1 스케줄 인풋 & O/X 토글 스타일 */
+/* 🌟 스케줄 모던 카드 박스 스타일 🌟 */
 .schedule-block {
   margin-bottom: 14px;
 }
-.schedule-block-header {
-  margin-bottom: 6px;
+
+.schedule-title-bar {
+  margin-bottom: 8px;
 }
+
 .schedule-title {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-main);
 }
-.schedule-list {
+
+.schedule-items-container {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 6px;
-  width: 100%;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.schedule-row {
+/* 개별 일정 항목 카드 (부드러운 라운딩 박스) */
+.schedule-card-item {
+  background-color: var(--item-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s;
+}
+
+.item-inputs-row {
+  display: flex;
   gap: 6px;
   width: 100%;
-  min-width: 0; /* Flex 자식 삐져나옴 방지 */
 }
 
-.schedule-time {
-  width: 96px;
-  flex-shrink: 0;
+.input-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   min-width: 0;
-  font-size: 0.85rem !important;
-  padding: 8px 6px !important;
-  text-align: center;
-  border-radius: 8px;
 }
 
-.schedule-text {
+.input-cell.time-cell {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.input-cell.time-range-cell {
+  width: 135px;
+  flex-shrink: 0;
+}
+
+.input-cell.text-cell {
   flex: 1;
-  min-width: 0; /* 글자가 길어도 우측 밀림 방지 */
-  font-size: 0.88rem !important;
-  padding: 8px 10px !important;
-  border-radius: 8px;
 }
 
-.schedule-actions {
+.cell-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+.cell-box-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--card-bg);
+  color: var(--text-main);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+}
+.cell-box-input:focus {
+  border-color: var(--primary-color);
+}
+
+/* 내일 일정의 [시작 ~ 종료] 감싸는 플렉스 */
+.time-range-wrap {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.range-tilde {
+  font-weight: 700;
+  color: var(--text-sub);
+  font-size: 14px;
   flex-shrink: 0;
 }
 
-/* O / X 토글 버튼 */
-.toggle-btn {
-  width: 32px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-color);
-  cursor: pointer;
-  font-size: 0.9rem;
-  display: inline-flex;
+/* 카드 하단 액션 바 (O/X 토글 + 삭제 버튼) */
+.item-actions-row {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: all 0.15s ease;
-  user-select: none;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-color);
 }
-.toggle-btn:active {
-  transform: scale(0.92);
-}
-.toggle-btn.active-o {
-  background-color: rgba(16, 185, 129, 0.2);
-  border-color: var(--done-color);
-  box-shadow: 0 0 0 1.5px var(--done-color);
-}
-.toggle-btn.active-x {
-  background-color: rgba(239, 68, 68, 0.2);
-  border-color: var(--missed-color);
-  box-shadow: 0 0 0 1.5px var(--missed-color);
+.item-actions-row.right-only {
+  justify-content: flex-end;
 }
 
-.del-row-btn {
-  width: 26px;
-  height: 34px;
-  border: none;
-  background: transparent;
+.ox-btn-group {
+  display: flex;
+  gap: 6px;
+}
+
+.ox-tag-btn {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
   color: var(--text-sub);
   cursor: pointer;
-  font-size: 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: color 0.15s;
+  gap: 3px;
+  transition: all 0.15s ease;
 }
-.del-row-btn:hover, .del-row-btn:active {
+.ox-tag-btn:active { transform: scale(0.95); }
+.ox-tag-btn.active-o {
+  background-color: var(--done-bg);
+  color: var(--done-color);
+  border-color: var(--done-color);
+  font-weight: 800;
+}
+.ox-tag-btn.active-x {
+  background-color: var(--missed-bg);
+  color: var(--missed-color);
+  border-color: var(--missed-color);
+  font-weight: 800;
+}
+
+.item-del-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-sub);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+.item-del-btn:hover, .item-del-btn:active {
   color: #ef4444;
 }
 
-.add-row-btn {
+.add-box-btn {
   width: 100%;
-  padding: 8px;
+  padding: 9px;
   background-color: var(--bg-color);
   border: 1px dashed var(--border-color);
   border-radius: 8px;
@@ -431,28 +449,13 @@ body {
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: background-color 0.15s;
 }
-.add-row-btn:active {
+.add-box-btn:active {
   background-color: var(--accent-color);
 }
 
 /* 폼 공통 스타일 */
-.form-step {
-  padding-top: 10px;
-}
-
-.step-badge {
-  font-size: 0.92rem;
-  font-weight: 800;
-  color: var(--primary-color);
-  padding: 0 4px;
-  overflow-wrap: break-word;
-}
-
 .sub-legend {
   font-size: 0.82rem;
   font-weight: 700;
@@ -470,34 +473,26 @@ body {
   font-size: 0.85rem;
   font-weight: 700;
   margin-bottom: 5px;
-  color: var(--text-main);
-  overflow-wrap: break-word;
-  word-break: keep-all;
 }
 
-input[type="text"],
+input[type="text"]:not(.meta-input):not(.cell-box-input),
 textarea {
   width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
   padding: 9px 11px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   background-color: var(--bg-color);
   color: var(--text-main);
-  font-size: 16px; /* 모바일 자동 줌 방지 */
+  font-size: 16px;
   font-family: inherit;
-  min-width: 0;
 }
-input[type="text"]:focus,
-textarea:focus {
+
+input:focus, textarea:focus {
   outline: none;
   border-color: var(--primary-color);
 }
 
-textarea {
-  resize: vertical;
-}
+textarea { resize: vertical; }
 
 .sub-group {
   margin-top: 10px;
@@ -512,9 +507,7 @@ textarea {
   margin-bottom: 5px;
 }
 
-.mb-sm {
-  margin-bottom: 6px;
-}
+.mb-sm { margin-bottom: 6px; }
 
 .fixed-scripture {
   font-size: 0.78rem;
@@ -532,12 +525,10 @@ textarea {
   display: flex;
   gap: 8px;
   margin-top: 10px;
-  width: 100%;
 }
 
 .primary-btn {
   flex: 2;
-  min-width: 0;
   background-color: var(--primary-color);
   color: #ffffff;
   border: none;
@@ -546,13 +537,11 @@ textarea {
   font-size: 0.98rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
 }
 .primary-btn:active { background-color: var(--primary-hover); }
 
 .secondary-btn {
   flex: 1;
-  min-width: 0;
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   color: var(--text-sub);
@@ -585,17 +574,4 @@ textarea {
 .toast.show {
   visibility: visible;
   opacity: 1;
-}
-
-/* 320px 미만 초소형 모바일 대응 */
-@media (max-width: 350px) {
-  .schedule-time {
-    width: 82px;
-    font-size: 0.78rem !important;
-    padding: 6px 4px !important;
-  }
-  .toggle-btn {
-    width: 28px;
-    height: 30px;
-  }
 }

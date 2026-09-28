@@ -65,7 +65,7 @@ body {
 
 .app-container {
   width: 100%;
-  max-width: 440px; /* Z Flip 5 폭 최적화 */
+  max-width: 440px;
   margin: 0 auto;
   padding: 12px;
 }
@@ -122,7 +122,6 @@ body {
   overflow: hidden;
 }
 
-/* Step 제목이 카드 칸 안에 쏙 들어가도록 설계 */
 .step-card-header {
   padding-bottom: 8px;
   margin-bottom: 12px;
@@ -136,7 +135,7 @@ body {
   display: block;
 }
 
-/* Meta Section (작성자 + 날짜) */
+/* Meta Section */
 .meta-row {
   display: flex;
   gap: 8px;
@@ -169,10 +168,38 @@ body {
   text-align: center;
 }
 
-.status-row {
-  margin-top: 8px;
+.meta-sub-row {
+  margin-top: 10px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.sync-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.sync-input-wrap label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
+.sync-key-input {
+  width: 85px;
+  padding: 4px 6px;
+  border: 1px dashed var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
 }
 
 .status-badge {
@@ -184,6 +211,7 @@ body {
   background-color: var(--bg-color);
   padding: 3px 8px;
   border-radius: 12px;
+  white-space: nowrap;
 }
 
 .status-dot {
@@ -285,12 +313,15 @@ body {
 }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 
-/* 🌟 스케줄 모던 카드 박스 스타일 🌟 */
+/* 스케줄 카드 스타일 */
 .schedule-block {
   margin-bottom: 14px;
 }
 
 .schedule-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
 }
 
@@ -300,6 +331,22 @@ body {
   color: var(--text-main);
 }
 
+.import-plan-btn {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--primary-color);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.import-plan-btn:active {
+  background: var(--accent-color);
+  transform: scale(0.96);
+}
+
 .schedule-items-container {
   display: flex;
   flex-direction: column;
@@ -307,271 +354,144 @@ body {
   margin-bottom: 8px;
 }
 
-/* 개별 일정 항목 카드 (부드러운 라운딩 박스) */
 .schedule-card-item {
   background-color: var(--item-bg);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: border-color 0.2s;
-}
+  display: flex;구글 Firebase 실시간 동기화, **[💾 저장하기] / [📋 작성 완료 및 복사] 버튼 분리**, 그리고 **직전일(D-1) 엄격 스케줄 연동**이 적용된 핵심 코드입니다.
 
-.item-inputs-row {
-  display: flex;
-  gap: 6px;
-  width: 100%;
-}
+---
 
-.input-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
+### 1. Firebase 1분 설정
+1. [Firebase 콘솔](https://console.firebase.google.com/)에서 프로젝트 생성 후 **Firestore Database** 만들기(테스트 모드).
+2. 웹 앱 추가(`</>`) 시 나오는 `firebaseConfig` 6줄을 `app.js` 상단에 붙여넣기만 하면 PC-스마트폰 자동 연동이 활성화됩니다. (미입력 시 로컬 모드로 작동)
 
-.input-cell.time-cell {
-  width: 110px;
-  flex-shrink: 0;
-}
+---
 
-.input-cell.time-range-cell {
-  width: 135px;
-  flex-shrink: 0;
-}
+### 2. `index.html` (버튼 분리 및 Firebase SDK 추가)
 
-.input-cell.text-cell {
-  flex: 1;
-}
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>일기장</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121417">
+  <link rel="stylesheet" href="style.css?v=11">
+  <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js)"></script>
+  <script src="[https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js](https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js)"></script>
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="brand"><span class="brand-icon">📓</span><h1 class="brand-title">일기장</h1></div>
+      <button id="theme-toggle" class="icon-btn">🌙</button>
+    </header>
 
-.cell-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--text-sub);
-}
+    <section class="meta-section card">
+      <div class="meta-row">
+        <div class="meta-col"><label for="user-name">👤 작성자</label><input type="text" id="user-name" value="준영" class="meta-input"></div>
+        <div class="meta-col"><label for="diary-date">📅 작성 날짜</label><input type="text" id="diary-date" class="meta-input"></div>
+      </div>
+      <div class="meta-sub-row">
+        <div class="sync-input-wrap">
+          <label for="sync-key">☁️ 연동코드</label>
+          <input type="text" id="sync-key" value="my-diary" class="sync-key-input" title="PC와 모바일이 같은 코드면 자동 연동됩니다">
+        </div>
+        <div class="status-badge" id="save-status"><span class="status-dot"></span><span id="save-status-text">저장 대기 중</span></div>
+      </div>
+    </section>
 
-.cell-box-input {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background-color: var(--card-bg);
-  color: var(--text-main);
-  font-size: 15px;
-  font-family: inherit;
-  outline: none;
-}
-.cell-box-input:focus {
-  border-color: var(--primary-color);
-}
+    <section class="calendar-section card">
+      <div class="calendar-top">
+        <div class="calendar-header">
+          <button type="button" id="prev-month-btn" class="cal-nav-btn">&lt;</button>
+          <h2 id="calendar-title">2026.09</h2>
+          <button type="button" id="next-month-btn" class="cal-nav-btn">&gt;</button>
+        </div>
+        <div class="calendar-stats">
+          <span class="stat-badge done" id="stat-done">작성: 0일</span>
+          <span class="stat-badge missed" id="stat-missed">미작성: 0일</span>
+        </div>
+      </div>
+      <div class="calendar-grid weekdays">
+        <div class="sun">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="sat">토</div>
+      </div>
+      <div id="calendar-days" class="calendar-grid days"></div>
+      <div class="calendar-legend">
+        <span class="legend-item"><span class="legend-mark done">✅</span> 작성 완료</span>
+        <span class="legend-item"><span class="legend-mark today">🔵</span> 오늘</span>
+        <span class="legend-item"><span class="legend-mark missed">▫️</span> 미작성</span>
+      </div>
+    </section>
 
-/* 내일 일정의 [시작 ~ 종료] 감싸는 플렉스 */
-.time-range-wrap {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+    <form id="diary-form" class="form-container">
+      <section class="card form-step">
+        <div class="step-card-header"><span class="step-badge">🤍 step.1 스케줄</span></div>
+        <div class="schedule-block">
+          <div class="schedule-title-bar">
+            <span class="schedule-title">⏰ 오늘 (⭕️❌)</span>
+            <button type="button" id="import-yesterday-btn" class="import-plan-btn">🔄 어제 계획 불러오기</button>
+          </div>
+          <div id="today-schedule-list" class="schedule-items-container"></div>
+          <button type="button" id="add-today-row-btn" class="add-box-btn">+ 오늘 일정 추가</button>
+        </div>
+        <div class="schedule-block">
+          <div class="schedule-title-bar"><span class="schedule-title">⏰ 내일</span></div>
+          <div id="tomorrow-schedule-list" class="schedule-items-container"></div>
+          <button type="button" id="add-tomorrow-row-btn" class="add-box-btn">+ 내일 일정 추가</button>
+        </div>
+      </section>
 
-.range-tilde {
-  font-weight: 700;
-  color: var(--text-sub);
-  font-size: 14px;
-  flex-shrink: 0;
-}
+      <section class="card form-step">
+        <div class="step-card-header"><span class="step-badge">🤍 step.2 미디어 디톡스</span></div>
+        <p class="sub-legend">▫️ 오늘 사용량</p>
+        <div class="input-block"><label for="media-search">검색 :</label><input type="text" id="media-search"></div>
+        <div class="input-block"><label for="media-sns">커뮤니티, SNS, 유튜브 :</label><input type="text" id="media-sns"></div>
+        <div class="input-block"><label for="media-video">영상물 :</label><input type="text" id="media-video"></div>
+        <div class="input-block"><label for="media-etc">기타 :</label><input type="text" id="media-etc"></div>
+      </section>
 
-/* 카드 하단 액션 바 (O/X 토글 + 삭제 버튼) */
-.item-actions-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 6px;
-  border-top: 1px dashed var(--border-color);
-}
-.item-actions-row.right-only {
-  justify-content: flex-end;
-}
+      <section class="card form-step">
+        <div class="step-card-header"><span class="step-badge">🤍 step.3 묵상</span></div>
+        <div class="input-block"><label for="meditation-chapter">🕯️ 성경 장</label><input type="text" id="meditation-chapter"></div>
+        <div class="input-block"><label for="meditation-content">와닿은 구절 &amp; 와닿은 이유 및 느낀점</label><textarea id="meditation-content" rows="4"></textarea></div>
+      </section>
 
-.ox-btn-group {
-  display: flex;
-  gap: 6px;
-}
+      <section class="card form-step">
+        <div class="step-card-header"><span class="step-badge">🤍 step.4 신앙일기</span></div>
+        <div class="input-block"><label for="faith-emotion">• 오늘 느낀 감정의 종류</label><input type="text" id="faith-emotion"></div>
+        <div class="input-block"><label for="faith-situation">감정을 느낀 상황은 무엇인가요?</label><textarea id="faith-situation" rows="2"></textarea></div>
+        <div class="input-block"><label for="faith-desire">나의 본심찾기 (나의 욕구:내가 원한 것)</label><textarea id="faith-desire" rows="2"></textarea></div>
+        <div class="input-block"><label for="faith-lesson">이 일을 통해 하나님께서 내게 알려주시고 싶으신 것은 무엇이었을까?</label><textarea id="faith-lesson" rows="3"></textarea></div>
+        <div class="sub-group">
+          <span class="sub-label">💛 감사한 점</span>
+          <input type="text" id="faith-gratitude-1" class="mb-sm"><input type="text" id="faith-gratitude-2">
+        </div>
+        <div class="sub-group">
+          <span class="sub-label">🙏🏻 회개할 점</span>
+          <input type="text" id="faith-repent-1" class="mb-sm"><input type="text" id="faith-repent-2">
+        </div>
+      </section>
 
-.ox-tag-btn {
-  padding: 5px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: var(--card-bg);
-  color: var(--text-sub);
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  transition: all 0.15s ease;
-}
-.ox-tag-btn:active { transform: scale(0.95); }
-.ox-tag-btn.active-o {
-  background-color: var(--done-bg);
-  color: var(--done-color);
-  border-color: var(--done-color);
-  font-weight: 800;
-}
-.ox-tag-btn.active-x {
-  background-color: var(--missed-bg);
-  color: var(--missed-color);
-  border-color: var(--missed-color);
-  font-weight: 800;
-}
+      <section class="card form-step">
+        <div class="step-card-header"><span class="step-badge">🤍 step.5 기도문</span></div>
+        <div class="input-block"><textarea id="prayer-content" rows="4"></textarea></div>
+        <div class="fixed-scripture">🧎🏻 시 62:1 나의 영혼이 잠잠히 하나님만 바람이여 나의 구원이 그에게서 나는도다</div>
+      </section>
 
-.item-del-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-sub);
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 4px 6px;
-}
-.item-del-btn:hover, .item-del-btn:active {
-  color: #ef4444;
-}
-
-.add-box-btn {
-  width: 100%;
-  padding: 9px;
-  background-color: var(--bg-color);
-  border: 1px dashed var(--border-color);
-  border-radius: 8px;
-  color: var(--primary-color);
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-.add-box-btn:active {
-  background-color: var(--accent-color);
-}
-
-/* 폼 공통 스타일 */
-.sub-legend {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: var(--text-sub);
-  margin-bottom: 8px;
-}
-
-.input-block {
-  margin-bottom: 10px;
-  width: 100%;
-}
-
-.input-block label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
-input[type="text"]:not(.meta-input):not(.cell-box-input),
-textarea {
-  width: 100%;
-  padding: 9px 11px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  font-size: 16px;
-  font-family: inherit;
-}
-
-input:focus, textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-textarea { resize: vertical; }
-
-.sub-group {
-  margin-top: 10px;
-  padding-top: 8px;
-  border-top: 1px dashed var(--border-color);
-}
-
-.sub-label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
-.mb-sm { margin-bottom: 6px; }
-
-.fixed-scripture {
-  font-size: 0.78rem;
-  color: var(--text-sub);
-  background-color: var(--accent-color);
-  padding: 9px 11px;
-  border-radius: 8px;
-  margin-top: 8px;
-  text-align: center;
-  line-height: 1.4;
-}
-
-/* 하단 버튼 */
-.action-footer {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.primary-btn {
-  flex: 2;
-  background-color: var(--primary-color);
-  color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  padding: 13px;
-  font-size: 0.98rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-.primary-btn:active { background-color: var(--primary-hover); }
-
-.secondary-btn {
-  flex: 1;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-sub);
-  border-radius: 12px;
-  padding: 13px;
-  font-size: 0.92rem;
-  cursor: pointer;
-}
-
-/* Toast */
-.toast {
-  visibility: hidden;
-  min-width: 200px;
-  max-width: 90%;
-  background-color: rgba(17, 24, 39, 0.95);
-  color: #fff;
-  text-align: center;
-  border-radius: 25px;
-  padding: 10px 16px;
-  position: fixed;
-  z-index: 1000;
-  left: 50%;
-  bottom: 30px;
-  transform: translateX(-50%);
-  font-size: 0.82rem;
-  opacity: 0;
-  transition: opacity 0.3s, visibility 0.3s;
-  pointer-events: none;
-}
-.toast.show {
-  visibility: visible;
-  opacity: 1;
-}
+      <!-- 분리된 저장 및 복사 버튼 -->
+      <div class="action-footer">
+        <button type="button" id="save-btn" class="save-btn">💾 저장하기</button>
+        <button type="button" id="copy-btn" class="copy-btn">📋 작성 완료 및 복사</button>
+        <button type="button" id="reset-btn" class="reset-btn">초기화</button>
+      </div>
+    </form>
+  </div>
+  <div id="toast" class="toast">알림</div>
+  <script src="app.js?v=11"></script>
+</body>
+</html>

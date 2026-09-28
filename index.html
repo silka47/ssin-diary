@@ -22,24 +22,26 @@
         <span class="brand-icon">🪽</span>
         <h1 class="brand-title">스신말기</h1>
       </div>
-      <div class="header-right">
-        <div class="user-badge">
-          <span class="user-label">작성자</span>
-          <input type="text" id="user-name" value="준영" class="user-name-input" placeholder="이름">
-        </div>
-        <button id="theme-toggle" class="icon-btn" aria-label="다크 모드 전환">🌙</button>
-      </div>
+      <button id="theme-toggle" class="icon-btn" aria-label="다크 모드 전환">🌙</button>
     </header>
 
-    <!-- 날짜 입력 & 자동 저장 알림 바 -->
+    <!-- 작성자 / 날짜 카드 -->
     <section class="meta-section card">
-      <div class="date-input-group">
-        <label for="diary-date">📅 작성 날짜</label>
-        <input type="text" id="diary-date" class="date-input" placeholder="_9/14 월">
+      <div class="meta-row">
+        <div class="meta-col">
+          <label for="user-name">👤 작성자</label>
+          <input type="text" id="user-name" value="준영" class="meta-input">
+        </div>
+        <div class="meta-col">
+          <label for="diary-date">📅 작성 날짜</label>
+          <input type="text" id="diary-date" class="meta-input">
+        </div>
       </div>
-      <div class="status-badge" id="save-status">
-        <span class="status-dot"></span>
-        <span id="save-status-text">저장 대기 중</span>
+      <div class="status-row">
+        <span class="status-badge" id="save-status">
+          <span class="status-dot"></span>
+          <span id="save-status-text">저장 대기 중</span>
+        </span>
       </div>
     </section>
 
@@ -71,117 +73,123 @@
 
     <!-- 일기 폼 -->
     <form id="diary-form" class="form-container">
-      <!-- Step 1: 스케줄 (행 분리 및 버튼식 O/X 토글) -->
-      <fieldset class="card form-step">
-        <legend class="step-badge">🤍 step.1 스케줄</legend>
+      <!-- Step 1: 스케줄 (자연스럽고 예쁜 카드 박스 구조) -->
+      <section class="card form-step">
+        <div class="step-card-header">
+          <span class="step-badge">🤍 step.1 스케줄</span>
+        </div>
         
-        <!-- 오늘 일정 -->
+        <!-- 오늘 일정 영역 -->
         <div class="schedule-block">
-          <div class="schedule-block-header">
+          <div class="schedule-title-bar">
             <span class="schedule-title">⏰ 오늘 (⭕️❌)</span>
           </div>
-          <div id="today-schedule-list" class="schedule-list">
-            <!-- 자바스크립트로 동적 생성 -->
+          <div id="today-schedule-list" class="schedule-items-container">
+            <!-- JS 동적 생성 -->
           </div>
-          <button type="button" id="add-today-row-btn" class="add-row-btn">
-            + 오늘 일정 추가
-          </button>
+          <button type="button" id="add-today-row-btn" class="add-box-btn">+ 오늘 일정 추가</button>
         </div>
 
-        <!-- 내일 일정 -->
+        <!-- 내일 일정 영역 -->
         <div class="schedule-block">
-          <div class="schedule-block-header">
+          <div class="schedule-title-bar">
             <span class="schedule-title">⏰ 내일</span>
           </div>
-          <div id="tomorrow-schedule-list" class="schedule-list">
-            <!-- 자바스크립트로 동적 생성 -->
+          <div id="tomorrow-schedule-list" class="schedule-items-container">
+            <!-- JS 동적 생성 -->
           </div>
-          <button type="button" id="add-tomorrow-row-btn" class="add-row-btn">
-            + 내일 일정 추가
-          </button>
+          <button type="button" id="add-tomorrow-row-btn" class="add-box-btn">+ 내일 일정 추가</button>
         </div>
-      </fieldset>
+      </section>
 
       <!-- Step 2: 미디어 디톡스 -->
-      <fieldset class="card form-step">
-        <legend class="step-badge">🤍 step.2 미디어 디톡스</legend>
+      <section class="card form-step">
+        <div class="step-card-header">
+          <span class="step-badge">🤍 step.2 미디어 디톡스</span>
+        </div>
         <p class="sub-legend">▫️ 오늘 사용량</p>
         <div class="input-block">
           <label for="media-search">검색 :</label>
-          <input type="text" id="media-search" placeholder="예: 30분">
+          <input type="text" id="media-search">
         </div>
         <div class="input-block">
           <label for="media-sns">커뮤니티, SNS, 유튜브 :</label>
-          <input type="text" id="media-sns" placeholder="예: 1시간">
+          <input type="text" id="media-sns">
         </div>
         <div class="input-block">
           <label for="media-video">영상물 :</label>
-          <input type="text" id="media-video" placeholder="예: 0분">
+          <input type="text" id="media-video">
         </div>
         <div class="input-block">
           <label for="media-etc">기타 :</label>
-          <input type="text" id="media-etc" placeholder="예: 15분">
+          <input type="text" id="media-etc">
         </div>
-      </fieldset>
+      </section>
 
       <!-- Step 3: 묵상 -->
-      <fieldset class="card form-step">
-        <legend class="step-badge">🤍 step.3 묵상</legend>
+      <section class="card form-step">
+        <div class="step-card-header">
+          <span class="step-badge">🤍 step.3 묵상</span>
+        </div>
         <div class="input-block">
           <label for="meditation-chapter">🕯️ 성경 장</label>
-          <input type="text" id="meditation-chapter" placeholder="예: 시편 62장">
+          <input type="text" id="meditation-chapter">
         </div>
         <div class="input-block">
           <label for="meditation-content">와닿은 구절 &amp; 와닿은 이유 및 느낀점</label>
-          <textarea id="meditation-content" rows="4" placeholder="말씀 구절과 묵상 내용을 자유롭게 기록하세요."></textarea>
+          <textarea id="meditation-content" rows="4"></textarea>
         </div>
-      </fieldset>
+      </section>
 
       <!-- Step 4: 신앙일기 -->
-      <fieldset class="card form-step">
-        <legend class="step-badge">🤍 step.4 신앙일기</legend>
+      <section class="card form-step">
+        <div class="step-card-header">
+          <span class="step-badge">🤍 step.4 신앙일기</span>
+        </div>
         <div class="input-block">
           <label for="faith-emotion">• 오늘 느낀 감정의 종류</label>
-          <input type="text" id="faith-emotion" placeholder="예: 평안, 조급함, 감사 등">
+          <input type="text" id="faith-emotion">
         </div>
         <div class="input-block">
           <label for="faith-situation">감정을 느낀 상황은 무엇인가요?</label>
-          <textarea id="faith-situation" rows="2" placeholder="상황을 적어주세요."></textarea>
+          <textarea id="faith-situation" rows="2"></textarea>
         </div>
         <div class="input-block">
           <label for="faith-desire">나의 본심찾기 (나의 욕구:내가 원한 것)</label>
-          <textarea id="faith-desire" rows="2" placeholder="마음속 진짜 욕구를 적어주세요."></textarea>
+          <textarea id="faith-desire" rows="2"></textarea>
         </div>
         <div class="input-block">
           <label for="faith-lesson">이 일을 통해 하나님께서 내게 알려주시고 싶으신 것은 무엇이었을까? (하나님의 도우심, 깨달은 점)</label>
-          <textarea id="faith-lesson" rows="3" placeholder="깨달은 점을 적어주세요."></textarea>
+          <textarea id="faith-lesson" rows="3"></textarea>
         </div>
         
         <div class="sub-group">
           <span class="sub-label">💛 감사한 점</span>
-          <input type="text" id="faith-gratitude-1" class="mb-sm" placeholder="1. 감사한 점">
-          <input type="text" id="faith-gratitude-2" placeholder="2. 감사한 점">
+          <input type="text" id="faith-gratitude-1" class="mb-sm">
+          <input type="text" id="faith-gratitude-2">
         </div>
 
         <div class="sub-group">
           <span class="sub-label">🙏🏻 회개할 점</span>
-          <input type="text" id="faith-repent-1" class="mb-sm" placeholder="1. 회개할 점">
-          <input type="text" id="faith-repent-2" placeholder="2. 회개할 점">
+          <input type="text" id="faith-repent-1" class="mb-sm">
+          <input type="text" id="faith-repent-2">
         </div>
-      </fieldset>
+      </section>
 
       <!-- Step 5: 기도문 -->
-      <fieldset class="card form-step">
-        <legend class="step-badge">🤍 step.5 기도문</legend>
+      <section class="card form-step">
+        <div class="step-card-header">
+          <span class="step-badge">🤍 step.5 기도문</span>
+        </div>
         <div class="input-block">
-          <textarea id="prayer-content" rows="4" placeholder="하나님께 드리는 솔직한 기도를 작성하세요."></textarea>
+          <textarea id="prayer-content" rows="4"></textarea>
         </div>
         <div class="fixed-scripture">
           🧎🏻 시 62:1 나의 영혼이 잠잠히 하나님만 바람이여 나의 구원이 그에게서 나는도다
         </div>
-      </fieldset>
+      </section>
 
-      <!-- 하단 고정 액션 버튼 -->
+      <!-- 하단 액션 버튼 -->
       <div class="action-footer">
         <button type="button" id="copy-btn" class="primary-btn">작성 완료 및 복사</button>
         <button type="button" id="reset-btn" class="secondary-btn">초기화</button>

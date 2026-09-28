@@ -3,29 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🪽</title>
+  <title>일기장</title>
   
-  <!-- PWA & Mobile Meta -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#121417" id="theme-color-meta">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=10">
+
+  <!-- Firebase SDK (호환 버전 CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div class="app-container">
-    <!-- Header -->
     <header class="app-header">
       <div class="brand">
-        <span class="brand-icon">🪽</span>
-        <h1 class="brand-title">스신말기</h1>
+        <span class="brand-icon">📓</span>
+        <h1 class="brand-title">일기장</h1>
       </div>
       <button id="theme-toggle" class="icon-btn" aria-label="다크 모드 전환">🌙</button>
     </header>
 
-    <!-- 작성자 / 날짜 카드 -->
+    <!-- 작성자 / 날짜 / 연동코드 카드 -->
     <section class="meta-section card">
       <div class="meta-row">
         <div class="meta-col">
@@ -37,11 +39,15 @@
           <input type="text" id="diary-date" class="meta-input">
         </div>
       </div>
-      <div class="status-row">
-        <span class="status-badge" id="save-status">
+      <div class="meta-sub-row">
+        <div class="sync-input-wrap">
+          <label for="sync-key" title="PC와 모바일에서 동일한 코드를 입력하면 자동 연동됩니다">☁️ 연동코드</label>
+          <input type="text" id="sync-key" value="my-diary" class="sync-key-input">
+        </div>
+        <div class="status-badge" id="save-status">
           <span class="status-dot"></span>
           <span id="save-status-text">저장 대기 중</span>
-        </span>
+        </div>
       </div>
     </section>
 
@@ -73,31 +79,28 @@
 
     <!-- 일기 폼 -->
     <form id="diary-form" class="form-container">
-      <!-- Step 1: 스케줄 (자연스럽고 예쁜 카드 박스 구조) -->
+      <!-- Step 1: 스케줄 -->
       <section class="card form-step">
         <div class="step-card-header">
           <span class="step-badge">🤍 step.1 스케줄</span>
         </div>
         
-        <!-- 오늘 일정 영역 -->
+        <!-- 오늘 일정 -->
         <div class="schedule-block">
           <div class="schedule-title-bar">
             <span class="schedule-title">⏰ 오늘 (⭕️❌)</span>
+            <button type="button" id="import-yesterday-btn" class="import-plan-btn">🔄 어제 계획 불러오기</button>
           </div>
-          <div id="today-schedule-list" class="schedule-items-container">
-            <!-- JS 동적 생성 -->
-          </div>
+          <div id="today-schedule-list" class="schedule-items-container"></div>
           <button type="button" id="add-today-row-btn" class="add-box-btn">+ 오늘 일정 추가</button>
         </div>
 
-        <!-- 내일 일정 영역 -->
+        <!-- 내일 일정 -->
         <div class="schedule-block">
           <div class="schedule-title-bar">
             <span class="schedule-title">⏰ 내일</span>
           </div>
-          <div id="tomorrow-schedule-list" class="schedule-items-container">
-            <!-- JS 동적 생성 -->
-          </div>
+          <div id="tomorrow-schedule-list" class="schedule-items-container"></div>
           <button type="button" id="add-tomorrow-row-btn" class="add-box-btn">+ 내일 일정 추가</button>
         </div>
       </section>
@@ -189,16 +192,17 @@
         </div>
       </section>
 
-      <!-- 하단 액션 버튼 -->
+      <!-- 분리된 하단 액션 버튼 -->
       <div class="action-footer">
-        <button type="button" id="copy-btn" class="primary-btn">작성 완료 및 복사</button>
-        <button type="button" id="reset-btn" class="secondary-btn">초기화</button>
+        <button type="button" id="save-btn" class="save-btn">💾 저장하기</button>
+        <button type="button" id="copy-btn" class="copy-btn">📋 작성 완료 및 복사</button>
+        <button type="button" id="reset-btn" class="reset-btn">초기화</button>
       </div>
     </form>
   </div>
 
-  <div id="toast" class="toast">클립보드에 복사되었습니다.</div>
+  <div id="toast" class="toast">알림</div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>

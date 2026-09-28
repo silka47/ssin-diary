@@ -3,29 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🪽</title>
+  <title>일기장</title>
   
-  <!-- PWA & Mobile Meta -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#121417" id="theme-color-meta">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
   <div class="app-container">
-    <!-- Header -->
     <header class="app-header">
       <div class="brand">
-        <span class="brand-icon">🪽</span>
-        <h1 class="brand-title">스신말기</h1>
+        <span class="brand-icon">📓</span>
+        <h1 class="brand-title">일기장</h1>
       </div>
       <button id="theme-toggle" class="icon-btn" aria-label="다크 모드 전환">🌙</button>
     </header>
 
-    <!-- 작성자 / 날짜 카드 -->
     <section class="meta-section card">
       <div class="meta-row">
         <div class="meta-col">
@@ -45,7 +42,6 @@
       </div>
     </section>
 
-    <!-- 미니 달력 (Habit Tracker) -->
     <section class="calendar-section card">
       <div class="calendar-top">
         <div class="calendar-header">
@@ -71,38 +67,29 @@
       </div>
     </section>
 
-    <!-- 일기 폼 -->
     <form id="diary-form" class="form-container">
-      <!-- Step 1: 스케줄 (자연스럽고 예쁜 카드 박스 구조) -->
       <section class="card form-step">
         <div class="step-card-header">
           <span class="step-badge">🤍 step.1 스케줄</span>
         </div>
         
-        <!-- 오늘 일정 영역 -->
         <div class="schedule-block">
           <div class="schedule-title-bar">
             <span class="schedule-title">⏰ 오늘 (⭕️❌)</span>
           </div>
-          <div id="today-schedule-list" class="schedule-items-container">
-            <!-- JS 동적 생성 -->
-          </div>
+          <div id="today-schedule-list" class="schedule-items-container"></div>
           <button type="button" id="add-today-row-btn" class="add-box-btn">+ 오늘 일정 추가</button>
         </div>
 
-        <!-- 내일 일정 영역 -->
         <div class="schedule-block">
           <div class="schedule-title-bar">
             <span class="schedule-title">⏰ 내일</span>
           </div>
-          <div id="tomorrow-schedule-list" class="schedule-items-container">
-            <!-- JS 동적 생성 -->
-          </div>
+          <div id="tomorrow-schedule-list" class="schedule-items-container"></div>
           <button type="button" id="add-tomorrow-row-btn" class="add-box-btn">+ 내일 일정 추가</button>
         </div>
       </section>
 
-      <!-- Step 2: 미디어 디톡스 -->
       <section class="card form-step">
         <div class="step-card-header">
           <span class="step-badge">🤍 step.2 미디어 디톡스</span>
@@ -126,7 +113,6 @@
         </div>
       </section>
 
-      <!-- Step 3: 묵상 -->
       <section class="card form-step">
         <div class="step-card-header">
           <span class="step-badge">🤍 step.3 묵상</span>
@@ -141,7 +127,6 @@
         </div>
       </section>
 
-      <!-- Step 4: 신앙일기 -->
       <section class="card form-step">
         <div class="step-card-header">
           <span class="step-badge">🤍 step.4 신앙일기</span>
@@ -176,7 +161,6 @@
         </div>
       </section>
 
-      <!-- Step 5: 기도문 -->
       <section class="card form-step">
         <div class="step-card-header">
           <span class="step-badge">🤍 step.5 기도문</span>
@@ -189,7 +173,6 @@
         </div>
       </section>
 
-      <!-- 하단 액션 버튼 -->
       <div class="action-footer">
         <button type="button" id="copy-btn" class="primary-btn">작성 완료 및 복사</button>
         <button type="button" id="reset-btn" class="secondary-btn">초기화</button>
@@ -199,6 +182,6 @@
 
   <div id="toast" class="toast">클립보드에 복사되었습니다.</div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

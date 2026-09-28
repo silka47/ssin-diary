@@ -1,9 +1,9 @@
-const CACHE_NAME = 'ssin-diary-v8';
+const CACHE_NAME = 'ssin-diary-v6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css?v=8',
-  './app.js?v=8',
+  './style.css',
+  './app.js',
   './manifest.json'
 ];
 

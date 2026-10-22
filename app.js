@@ -467,9 +467,25 @@ ${v('prayer-content')}
     setTimeout(() => toast.classList.remove('show'), 2500);
   }
 
-  // =========================================================
-  // 🌟 [추가 기능] 묵상/생각 기록 탭 전환 및 CRUD 로직 🌟
-  // =========================================================
+ // =========================================================
+// 🌟 [독립 실행형] 묵상/생각 기록 탭 전환 및 CRUD 로직 🌟
+// =========================================================
+document.addEventListener('DOMContentLoaded', () => {
+  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+  const syncKeyInput = document.getElementById('sync-key');
+  const toast = document.getElementById('toast');
+
+  function getSyncId() {
+    return (syncKeyInput && syncKeyInput.value.trim()) || 'my-diary';
+  }
+
+  function showToast(msg) {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
   const tabBtnDiary = document.getElementById('tab-btn-diary');
   const tabBtnMeditation = document.getElementById('tab-btn-meditation');
   const viewDiary = document.getElementById('tab-diary-view');
@@ -518,7 +534,7 @@ ${v('prayer-content')}
     const syncId = getSyncId();
     let loaded = null;
 
-    if (db) {
+    if (typeof db !== 'undefined' && db) {
       try {
         const snapshot = await db.collection('diaries').doc(syncId).collection('meditations').orderBy('createdAt', 'desc').get();
         loaded = [];
@@ -590,11 +606,11 @@ ${v('prayer-content')}
 
       item.querySelector('.med-action-btn.edit').addEventListener('click', (e) => {
         e.stopPropagation();
-        medFormTitle.textContent = '✏️ 묵상/생각 수정하기';
-        medEditIdInput.value = note.id;
-        medTitleInput.value = note.title;
-        medBodyInput.value = note.content;
-        medEditorCard.style.display = 'block';
+        if (medFormTitle) medFormTitle.textContent = '✏️ 묵상/생각 수정하기';
+        if (medEditIdInput) medEditIdInput.value = note.id;
+        if (medTitleInput) medTitleInput.value = note.title;
+        if (medBodyInput) medBodyInput.value = note.content;
+        if (medEditorCard) medEditorCard.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
@@ -605,7 +621,7 @@ ${v('prayer-content')}
         meditationNotes = meditationNotes.filter(n => n.id !== note.id);
         localStorage.setItem('meditation_notes_' + syncId, JSON.stringify(meditationNotes));
 
-        if (db) {
+        if (typeof db !== 'undefined' && db) {
           try {
             await db.collection('diaries').doc(syncId).collection('meditations').doc(note.id).delete();
           } catch (err) { console.warn("Cloud delete error:", err); }
@@ -684,7 +700,7 @@ ${v('prayer-content')}
 
       localStorage.setItem('meditation_notes_' + syncId, JSON.stringify(meditationNotes));
 
-      if (db) {
+      if (typeof db !== 'undefined' && db) {
         try {
           await db.collection('diaries').doc(syncId).collection('meditations').doc(noteObj.id).set(noteObj, { merge: true });
         } catch (e) { console.warn("Meditation cloud save error:", e); }

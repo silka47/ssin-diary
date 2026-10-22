@@ -92,3 +92,33 @@ input[type="text"]:not(.meta-input):not(.cell-box-input), textarea { width: 100%
 .reset-btn { flex: 0.8; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-sub); border-radius: 12px; padding: 13px 4px; font-size: 0.88rem; cursor: pointer; }
 .toast { visibility: hidden; min-width: 200px; max-width: 90%; background: rgba(17,24,39,0.95); color: #fff; text-align: center; border-radius: 25px; padding: 10px 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.82rem; opacity: 0; transition: 0.3s; }
 .toast.show { visibility: visible; opacity: 1; }
+
+/* ========================================== */
+/* 🌟 묵상/생각 기록 탭 전용 추가 스타일 🌟 */
+/* ========================================== */
+.tab-nav { display: flex; gap: 8px; margin-bottom: 12px; }
+.tab-nav-btn { flex: 1; padding: 11px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-sub); font-size: 0.9rem; font-weight: 800; cursor: pointer; box-shadow: var(--shadow); transition: 0.2s; }
+.tab-nav-btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+
+.meditation-list-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+.new-meditation-btn { background: var(--primary-color); color: #fff; border: none; border-radius: 8px; padding: 6px 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+.meditation-form-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+.meditation-list-container { display: flex; flex-direction: column; gap: 10px; }
+.meditation-empty { text-align: center; padding: 30px 10px; color: var(--text-sub); font-size: 0.85rem; }
+
+.meditation-item { background: var(--item-bg); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; transition: 0.2s; }
+.meditation-item-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+.meditation-item-title-wrap { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; padding-right: 8px; }
+.meditation-item-title { font-size: 0.95rem; font-weight: 800; color: var(--text-main); word-break: break-word; }
+.meditation-item-date { font-size: 0.72rem; color: var(--text-sub); }
+.meditation-item-arrow { font-size: 0.8rem; color: var(--text-sub); transition: transform 0.2s; }
+.meditation-item.open .meditation-item-arrow { transform: rotate(180deg); color: var(--primary-color); }
+
+.meditation-item-body { display: none; padding: 12px 14px; border-top: 1px dashed var(--border-color); background: var(--card-bg); }
+.meditation-item.open .meditation-item-body { display: block; }
+.meditation-item-content { font-size: 0.9rem; color: var(--text-main); white-space: pre-wrap; line-height: 1.6; margin-bottom: 12px; }
+.meditation-item-actions { display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 8px; }
+.med-action-btn { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; font-weight: 700; color: var(--text-sub); cursor: pointer; }
+.med-action-btn.edit { color: var(--primary-color); }
+.med-action-btn.delete { color: var(--missed-color); }

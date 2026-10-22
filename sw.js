@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ssin-diary-v11';
+const CACHE_NAME = 'ssin-diary-v13';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -18,6 +18,11 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
+  // POST 요청(파이어베이스 통신 등)은 캐시하지 않고 바로 통과시킴
+  if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
   e.respondWith(
     fetch(e.request)
       .then((res) => {

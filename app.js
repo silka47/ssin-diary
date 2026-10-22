@@ -221,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (validToday.length > 0) {
       validToday.forEach(it => todayList.appendChild(createTodayCard(it)));
     } else {
-      // 오늘 일정이 비어있다면 -> 오직 '어제(D-1)' 계획만 확인! 없으면 빈칸 유지
       const d1Plan = getD1TomorrowPlan(dateKey);
       if (d1Plan && d1Plan.length > 0) {
         d1Plan.forEach(it => {
@@ -299,11 +298,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function autoSaveLocal() { saveDraft(false); }
 
-  // 🌟 [💾 저장하기] 전용 버튼 클릭
   const saveBtn = document.getElementById('save-btn');
   if (saveBtn) saveBtn.addEventListener('click', () => saveDraft(true));
 
-  // 🌟 [📋 작성 완료 및 복사] 전용 버튼 클릭
   const copyBtn = document.getElementById('copy-btn');
   if (copyBtn) {
     copyBtn.addEventListener('click', async () => {
@@ -469,9 +466,8 @@ ${v('prayer-content')}
     toast.textContent = msg; toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 2500);
   }
-});
 
-// =========================================================
+  // =========================================================
   // 🌟 [추가 기능] 묵상/생각 기록 탭 전환 및 CRUD 로직 🌟
   // =========================================================
   const tabBtnDiary = document.getElementById('tab-btn-diary');
@@ -496,20 +492,19 @@ ${v('prayer-content')}
     tabBtnDiary.addEventListener('click', () => {
       tabBtnDiary.classList.add('active');
       tabBtnMeditation.classList.remove('active');
-      viewDiary.style.display = 'block';
-      viewMeditation.style.display = 'none';
+      if (viewDiary) viewDiary.style.display = 'block';
+      if (viewMeditation) viewMeditation.style.display = 'none';
     });
 
     tabBtnMeditation.addEventListener('click', () => {
       tabBtnMeditation.classList.add('active');
       tabBtnDiary.classList.remove('active');
-      viewDiary.style.display = 'none';
-      viewMeditation.style.display = 'block';
-      loadMeditationNotes(); // 탭 열 때 목록 불러오기
+      if (viewDiary) viewDiary.style.display = 'none';
+      if (viewMeditation) viewMeditation.style.display = 'block';
+      loadMeditationNotes();
     });
   }
 
-  // 연동코드 변경 시 묵상 목록도 다시 불러오기
   if (syncKeyInput) {
     syncKeyInput.addEventListener('change', () => {
       if (viewMeditation && viewMeditation.style.display !== 'none') {
@@ -518,7 +513,7 @@ ${v('prayer-content')}
     });
   }
 
-  // 2. 묵상 목록 불러오기 (Firebase & LocalStorage 연동)
+  // 2. 묵상 목록 불러오기
   async function loadMeditationNotes() {
     const syncId = getSyncId();
     let loaded = null;
@@ -543,7 +538,7 @@ ${v('prayer-content')}
     renderMeditationList();
   }
 
-  // 3. 묵상 목록 화면에 그리기 (제목 클릭 시 펼쳐보기)
+  // 3. 묵상 목록 렌더링
   function renderMeditationList() {
     if (!medListContainer) return;
     medListContainer.innerHTML = '';
@@ -574,17 +569,14 @@ ${v('prayer-content')}
         </div>
       `;
 
-      // XSS 방지를 위해 텍스트 안전하게 삽입
       item.querySelector('.meditation-item-title').textContent = note.title;
       item.querySelector('.meditation-item-content').textContent = note.content;
 
-      // 제목 바 클릭 시 본문 아코디언 열기/닫기
       const header = item.querySelector('.meditation-item-header');
       header.addEventListener('click', () => {
         item.classList.toggle('open');
       });
 
-      // 복사 버튼
       item.querySelector('.med-action-btn.copy').addEventListener('click', async (e) => {
         e.stopPropagation();
         const copyText = `📌 [${note.title}]\n(${note.dateStr})\n\n${note.content}`;
@@ -596,7 +588,6 @@ ${v('prayer-content')}
         }
       });
 
-      // 수정 버튼
       item.querySelector('.med-action-btn.edit').addEventListener('click', (e) => {
         e.stopPropagation();
         medFormTitle.textContent = '✏️ 묵상/생각 수정하기';
@@ -607,7 +598,6 @@ ${v('prayer-content')}
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
 
-      // 삭제 버튼
       item.querySelector('.med-action-btn.delete').addEventListener('click', async (e) => {
         e.stopPropagation();
         if (!confirm(`'${note.title}' 기록을 삭제하시겠습니까?`)) return;
@@ -631,45 +621,44 @@ ${v('prayer-content')}
   // 4. 새 기록 쓰기 폼 열기/닫기
   if (openMedFormBtn) {
     openMedFormBtn.addEventListener('click', () => {
-      medFormTitle.textContent = '✍️ 새 묵상/생각 기록하기';
-      medEditIdInput.value = '';
-      medTitleInput.value = '';
-      medBodyInput.value = '';
-      medEditorCard.style.display = 'block';
-      medTitleInput.focus();
+      if (medFormTitle) medFormTitle.textContent = '✍️ 새 묵상/생각 기록하기';
+      if (medEditIdInput) medEditIdInput.value = '';
+      if (medTitleInput) medTitleInput.value = '';
+      if (medBodyInput) medBodyInput.value = '';
+      if (medEditorCard) medEditorCard.style.display = 'block';
+      if (medTitleInput) medTitleInput.focus();
     });
   }
 
   if (medCancelBtn) {
     medCancelBtn.addEventListener('click', () => {
-      medEditorCard.style.display = 'none';
+      if (medEditorCard) medEditorCard.style.display = 'none';
     });
   }
 
   // 5. 묵상 기록 저장하기
   if (medSaveBtn) {
     medSaveBtn.addEventListener('click', async () => {
-      const title = medTitleInput.value.trim();
-      const content = medBodyInput.value.trim();
+      const title = medTitleInput ? medTitleInput.value.trim() : '';
+      const content = medBodyInput ? medBodyInput.value.trim() : '';
       if (!title) {
         showToast('제목을 입력해주세요 📌');
-        medTitleInput.focus();
+        if (medTitleInput) medTitleInput.focus();
         return;
       }
       if (!content) {
         showToast('내용을 입력해주세요 💭');
-        medBodyInput.focus();
+        if (medBodyInput) medBodyInput.focus();
         return;
       }
 
       const syncId = getSyncId();
-      const editId = medEditIdInput.value;
+      const editId = medEditIdInput ? medEditIdInput.value : '';
       const nowTime = new Date();
       const dateStr = `${nowTime.getFullYear()}.${String(nowTime.getMonth() + 1).padStart(2, '0')}.${String(nowTime.getDate()).padStart(2, '0')} (${dayNames[nowTime.getDay()]})`;
 
       let noteObj;
       if (editId) {
-        // 기존 글 수정
         const existing = meditationNotes.find(n => n.id === editId);
         noteObj = {
           id: editId,
@@ -681,7 +670,6 @@ ${v('prayer-content')}
         };
         meditationNotes = meditationNotes.map(n => n.id === editId ? noteObj : n);
       } else {
-        // 새 글 작성
         const newId = 'med_' + Date.now();
         noteObj = {
           id: newId,
@@ -694,18 +682,17 @@ ${v('prayer-content')}
         meditationNotes.unshift(noteObj);
       }
 
-      // 로컬 저장
       localStorage.setItem('meditation_notes_' + syncId, JSON.stringify(meditationNotes));
 
-      // 파이어베이스 클라우드 저장
       if (db) {
         try {
           await db.collection('diaries').doc(syncId).collection('meditations').doc(noteObj.id).set(noteObj, { merge: true });
         } catch (e) { console.warn("Meditation cloud save error:", e); }
       }
 
-      medEditorCard.style.display = 'none';
+      if (medEditorCard) medEditorCard.style.display = 'none';
       renderMeditationList();
       showToast('묵상 기록이 안전하게 저장되었습니다 💾');
     });
   }
+});

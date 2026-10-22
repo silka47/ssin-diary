@@ -13,35 +13,27 @@ if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== 'YOUR_API_KEY')
   try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
-  } catch(e) { console.warn("Firebase fallback:", e); }
+  } catch (e) {
+    console.warn("Firebase fallback:", e);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(console.error);
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(console.error);
+  }
 
   const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
   const now = new Date();
 
-  function formatDateBadge(d) { return `_${d.getMonth() + 1}/${d.getDate()} ${dayNames[d.getDay()]}`; }
-
-  function parseDateKey(dateStr, fallbackYear) {
-    const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0'), d = String(now.getDate()).padStart(2, '0');
-    if (!dateStr || typeof dateStr !== 'string') return `${y}-${m}-${d}`;
-    const nums = dateStr.match(/\d+/g);
-    if (nums && nums.length >= 2) {
-      const monthNum = Number(nums.at(0)), dayNum = Number(nums.at(1));
-      if (monthNum >= 1 && monthNum <= 12 && dayNum >= 1 && dayNum <= 31) {
-        return `${fallbackYear}-${String(monthNum).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-      }
-    }
-    return `${y}-${m}-${d}`;
+  function formatDateBadge(d) {
+    return `_${d.getMonth() + 1}/${d.getDate()} ${dayNames[d.getDay()]}`;
   }
 
-  // 정확히 직전 하루 전(D-1) 계산 함수
   function getYesterdayDateKey(dateKey) {
     const nums = dateKey.match(/\d+/g);
     if (!nums || nums.length < 3) return '';
-    const dt = new Date(Number(nums.at(0)), Number(nums.at(1)) - 1, Number(nums.at(2)));
+    const dt = new Date(Number(nums[0]), Number(nums[1]) - 1, Number(nums[2]));
     dt.setDate(dt.getDate() - 1);
     return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
   }
@@ -58,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const addTomorrowBtn = document.getElementById('add-tomorrow-row-btn');
   const importYesterdayBtn = document.getElementById('import-yesterday-btn');
 
-  let calCurrentYear = now.getFullYear(), calCurrentMonth = now.getMonth();
+  let calCurrentYear = now.getFullYear();
+  let calCurrentMonth = now.getMonth();
   const realTodayKey = `${calCurrentYear}-${String(calCurrentMonth + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   let activeDateKey = realTodayKey;
 
@@ -70,7 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
     'faith-repent-2', 'prayer-content'
   ];
 
-  function getSyncId() { return (syncKeyInput && syncKeyInput.value.trim()) || 'my-diary'; }
+  function getSyncId() {
+    return (syncKeyInput && syncKeyInput.value.trim()) || 'my-diary';
+  }
+
+  function showToast(msg) {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
 
   // 다크 모드
   const themeToggleBtn = document.getElementById('theme-toggle');
@@ -104,7 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <button type="button" class="item-del-btn">✕ 삭제</button>
       </div>`;
-    const btnO = card.querySelector('.ox-o'), btnX = card.querySelector('.ox-x');
+    const btnO = card.querySelector('.ox-o');
+    const btnX = card.querySelector('.ox-x');
     btnO.addEventListener('click', () => {
       card.dataset.status = card.dataset.status === 'O' ? '' : 'O';
       btnO.classList.toggle('active-o', card.dataset.status === 'O');
@@ -147,8 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return card;
   }
 
-  if (addTodayBtn) addTodayBtn.addEventListener('click', () => todayList.appendChild(createTodayCard()));
-  if (addTomorrowBtn) addTomorrowBtn.addEventListener('click', () => tomorrowList.appendChild(createTomorrowCard()));
+  if (addTodayBtn && todayList) addTodayBtn.addEventListener('click', () => todayList.appendChild(createTodayCard()));
+  if (addTomorrowBtn && tomorrowList) addTomorrowBtn.addEventListener('click', () => tomorrowList.appendChild(createTomorrowCard()));
 
   function getTodayScheduleData() {
     const list = [];
@@ -174,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return list;
   }
 
-  // 오직 직전 하루 전(D-1)의 내일 계획만 조회
   function getD1TomorrowPlan(dateKey) {
     const yKey = getYesterdayDateKey(dateKey);
     const raw = localStorage.getItem('block_tomorrow_' + yKey);
@@ -184,21 +186,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (Array.isArray(parsed)) {
           return parsed.filter(it => (it.start && it.start.trim()) || (it.end && it.end.trim()) || (it.text && it.text.trim()));
         }
-      } catch(e) {}
+      } catch (e) {}
     }
     return null;
   }
 
-  // 날짜별 로드 및 D-1 엄격 연동
   async function loadDataForDate(dateKey) {
-    todayList.innerHTML = ''; tomorrowList.innerHTML = '';
+    if (!todayList || !tomorrowList) return;
+    todayList.innerHTML = '';
+    tomorrowList.innerHTML = '';
     let entryData = null;
 
     if (db) {
       try {
         const doc = await db.collection('diaries').doc(getSyncId()).collection('entries').doc(dateKey).get();
         if (doc.exists) entryData = doc.data();
-      } catch(e) { console.warn("Cloud read failed:", e); }
+      } catch (e) {
+        console.warn("Cloud read failed:", e);
+      }
     }
 
     if (!entryData) {
@@ -241,7 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 어제 계획 불러오기 수동 버튼
   if (importYesterdayBtn) {
     importYesterdayBtn.addEventListener('click', () => {
       const d1Plan = getD1TomorrowPlan(activeDateKey);
@@ -259,7 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 통합 저장 로직 (DB & 로컬 동시 저장)
   async function saveDraft(showSuccessToast = false) {
     const textData = {};
     diaryTextFieldIds.forEach(id => {
@@ -269,14 +272,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const todayItems = getTodayScheduleData();
     const tomorrowItems = getTomorrowScheduleData();
 
-    // 1. 로컬 저장
     localStorage.setItem('diary_text_' + activeDateKey, JSON.stringify(textData));
     localStorage.setItem('block_today_' + activeDateKey, JSON.stringify(todayItems));
     localStorage.setItem('block_tomorrow_' + activeDateKey, JSON.stringify(tomorrowItems));
     if (userNameInput) localStorage.setItem('user_name', userNameInput.value.trim());
     if (syncKeyInput) localStorage.setItem('sync_key', syncKeyInput.value.trim());
 
-    // 2. 클라우드 DB 저장 (Firebase 활성화 시)
     if (db) {
       try {
         await db.collection('diaries').doc(getSyncId()).collection('entries').doc(activeDateKey).set({
@@ -286,7 +287,9 @@ document.addEventListener('DOMContentLoaded', () => {
           tomorrowItems,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-      } catch(e) { console.warn("Cloud save error:", e); }
+      } catch (e) {
+        console.warn("Cloud save error:", e);
+      }
     }
 
     if (saveStatusText) {
@@ -296,7 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (showSuccessToast) showToast('진행상황이 클라우드와 기기에 안전하게 저장되었습니다 💾');
   }
 
-  function autoSaveLocal() { saveDraft(false); }
+  function autoSaveLocal() {
+    saveDraft(false);
+  }
 
   const saveBtn = document.getElementById('save-btn');
   if (saveBtn) saveBtn.addEventListener('click', () => saveDraft(true));
@@ -311,7 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const todayLines = getTodayScheduleData().map(it => {
         let line = `${it.time} ${it.text}`.trim();
-        if (it.status === 'O') line += ' ⭕️'; else if (it.status === 'X') line += ' ❌';
+        if (it.status === 'O') line += ' ⭕️';
+        else if (it.status === 'X') line += ' ❌';
         return line;
       }).filter(l => l.length > 0).join('\n');
 
@@ -364,11 +370,16 @@ ${v('prayer-content')}
 🧎🏻시 62:1 나의 영혼이 잠잠히 하나님만 바람이여 나의 구원이 그에게서 나는도다`;
 
       try {
-        if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(formattedText);
-        else {
-          const temp = document.createElement('textarea'); temp.value = formattedText;
-          temp.style.position = 'fixed'; temp.style.left = '-9999px';
-          document.body.appendChild(temp); temp.select(); document.execCommand('copy');
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(formattedText);
+        } else {
+          const temp = document.createElement('textarea');
+          temp.value = formattedText;
+          temp.style.position = 'fixed';
+          temp.style.left = '-9999px';
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand('copy');
           document.body.removeChild(temp);
         }
 
@@ -382,31 +393,40 @@ ${v('prayer-content')}
         }
         renderCalendar(calCurrentYear, calCurrentMonth);
         showToast('일기가 복사되고 완료(✅) 처리되었습니다 📋');
-      } catch(e) { showToast('복사 권한 오류가 발생했습니다.'); }
+      } catch (e) {
+        showToast('복사 권한 오류가 발생했습니다.');
+      }
     });
   }
 
-  // 초기화 버튼
   const resetBtn = document.getElementById('reset-btn');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       if (confirm('현재 날짜의 내용을 초기화하시겠습니까?')) {
-        diaryTextFieldIds.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-        todayList.innerHTML = ''; tomorrowList.innerHTML = '';
-        todayList.appendChild(createTodayCard()); tomorrowList.appendChild(createTomorrowCard());
+        diaryTextFieldIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+        todayList.innerHTML = '';
+        tomorrowList.innerHTML = '';
+        todayList.appendChild(createTodayCard());
+        tomorrowList.appendChild(createTomorrowCard());
         autoSaveLocal();
         showToast('초기화되었습니다.');
       }
     });
   }
 
-  // 달력
-  const calTitle = document.getElementById('calendar-title'), calDaysContainer = document.getElementById('calendar-days');
-  const statDone = document.getElementById('stat-done'), statMissed = document.getElementById('stat-missed');
+  const calTitle = document.getElementById('calendar-title');
+  const calDaysContainer = document.getElementById('calendar-days');
+  const statDone = document.getElementById('stat-done');
+  const statMissed = document.getElementById('stat-missed');
+
   function getCompletedDates() {
     const raw = localStorage.getItem('completed_dates');
     return raw ? JSON.parse(raw) : [];
   }
+
   function renderCalendar(year, month) {
     if (!calTitle || !calDaysContainer) return;
     calTitle.textContent = `${year}.${String(month + 1).padStart(2, '0')}`;
@@ -414,16 +434,24 @@ ${v('prayer-content')}
     const firstDayIndex = new Date(year, month, 1).getDay();
     const lastDate = new Date(year, month + 1, 0).getDate();
     const completedList = getCompletedDates();
-    let monthDoneCount = 0, monthMissedCount = 0;
+    let monthDoneCount = 0;
+    let monthMissedCount = 0;
 
-    for (let i = 0; i < firstDayIndex; i++) calDaysContainer.appendChild(document.createElement('div'));
+    for (let i = 0; i < firstDayIndex; i++) {
+      calDaysContainer.appendChild(document.createElement('div'));
+    }
     for (let day = 1; day <= lastDate; day++) {
       const dayDiv = document.createElement('div');
       dayDiv.textContent = day;
       const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (dateKey === realTodayKey) dayDiv.classList.add('today');
-      if (completedList.includes(dateKey)) { dayDiv.classList.add('completed'); monthDoneCount++; }
-      else if (dateKey < realTodayKey) { dayDiv.classList.add('missed'); monthMissedCount++; }
+      if (completedList.includes(dateKey)) {
+        dayDiv.classList.add('completed');
+        monthDoneCount++;
+      } else if (dateKey < realTodayKey) {
+        dayDiv.classList.add('missed');
+        monthMissedCount++;
+      }
 
       dayDiv.addEventListener('click', async () => {
         await saveDraft(false);
@@ -440,11 +468,20 @@ ${v('prayer-content')}
   }
 
   document.getElementById('prev-month-btn')?.addEventListener('click', () => {
-    calCurrentMonth--; if (calCurrentMonth < 0) { calCurrentMonth = 11; calCurrentYear--; }
+    calCurrentMonth--;
+    if (calCurrentMonth < 0) {
+      calCurrentMonth = 11;
+      calCurrentYear--;
+    }
     renderCalendar(calCurrentYear, calCurrentMonth);
   });
+
   document.getElementById('next-month-btn')?.addEventListener('click', () => {
-    calCurrentMonth++; if (calCurrentMonth > 11) { calCurrentMonth = 0; calCurrentYear++; }
+    calCurrentMonth++;
+    if (calCurrentMonth > 11) {
+      calCurrentMonth = 0;
+      calCurrentYear++;
+    }
     renderCalendar(calCurrentYear, calCurrentMonth);
   });
 
@@ -461,31 +498,9 @@ ${v('prayer-content')}
   loadDataForDate(activeDateKey);
   setInterval(autoSaveLocal, 5000);
 
-  function showToast(msg) {
-    if (!toast) return;
-    toast.textContent = msg; toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }
-
- // =========================================================
-// 🌟 [독립 실행형] 묵상/생각 기록 탭 전환 및 CRUD 로직 🌟
-// =========================================================
-document.addEventListener('DOMContentLoaded', () => {
-  const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-  const syncKeyInput = document.getElementById('sync-key');
-  const toast = document.getElementById('toast');
-
-  function getSyncId() {
-    return (syncKeyInput && syncKeyInput.value.trim()) || 'my-diary';
-  }
-
-  function showToast(msg) {
-    if (!toast) return;
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }
-
+  // =========================================================
+  // 🌟 묵상/생각 기록 탭 전환 및 CRUD 로직 🌟
+  // =========================================================
   const tabBtnDiary = document.getElementById('tab-btn-diary');
   const tabBtnMeditation = document.getElementById('tab-btn-meditation');
   const viewDiary = document.getElementById('tab-diary-view');
@@ -503,7 +518,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let meditationNotes = [];
 
-  // 1. 탭 전환 이벤트
   if (tabBtnDiary && tabBtnMeditation) {
     tabBtnDiary.addEventListener('click', () => {
       tabBtnDiary.classList.add('active');
@@ -529,12 +543,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 2. 묵상 목록 불러오기
   async function loadMeditationNotes() {
     const syncId = getSyncId();
     let loaded = null;
 
-    if (typeof db !== 'undefined' && db) {
+    if (db) {
       try {
         const snapshot = await db.collection('diaries').doc(syncId).collection('meditations').orderBy('createdAt', 'desc').get();
         loaded = [];
@@ -554,7 +567,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMeditationList();
   }
 
-  // 3. 묵상 목록 렌더링
   function renderMeditationList() {
     if (!medListContainer) return;
     medListContainer.innerHTML = '';
@@ -609,6 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (medFormTitle) medFormTitle.textContent = '✏️ 묵상/생각 수정하기';
         if (medEditIdInput) medEditIdInput.value = note.id;
         if (medTitleInput) medTitleInput.value = note.title;
+        if (medBodyInput) medTitleInput.value = note.title;
         if (medBodyInput) medBodyInput.value = note.content;
         if (medEditorCard) medEditorCard.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -621,10 +634,12 @@ document.addEventListener('DOMContentLoaded', () => {
         meditationNotes = meditationNotes.filter(n => n.id !== note.id);
         localStorage.setItem('meditation_notes_' + syncId, JSON.stringify(meditationNotes));
 
-        if (typeof db !== 'undefined' && db) {
+        if (db) {
           try {
             await db.collection('diaries').doc(syncId).collection('meditations').doc(note.id).delete();
-          } catch (err) { console.warn("Cloud delete error:", err); }
+          } catch (err) {
+            console.warn("Cloud delete error:", err);
+          }
         }
         renderMeditationList();
         showToast('기록이 삭제되었습니다.');
@@ -634,7 +649,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 4. 새 기록 쓰기 폼 열기/닫기
   if (openMedFormBtn) {
     openMedFormBtn.addEventListener('click', () => {
       if (medFormTitle) medFormTitle.textContent = '✍️ 새 묵상/생각 기록하기';
@@ -652,7 +666,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. 묵상 기록 저장하기
   if (medSaveBtn) {
     medSaveBtn.addEventListener('click', async () => {
       const title = medTitleInput ? medTitleInput.value.trim() : '';
@@ -700,10 +713,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       localStorage.setItem('meditation_notes_' + syncId, JSON.stringify(meditationNotes));
 
-      if (typeof db !== 'undefined' && db) {
+      if (db) {
         try {
           await db.collection('diaries').doc(syncId).collection('meditations').doc(noteObj.id).set(noteObj, { merge: true });
-        } catch (e) { console.warn("Meditation cloud save error:", e); }
+        } catch (e) {
+          console.warn("Meditation cloud save error:", e);
+        }
       }
 
       if (medEditorCard) medEditorCard.style.display = 'none';

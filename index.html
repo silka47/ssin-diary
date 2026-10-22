@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=12">
 
   <!-- Firebase SDK (호환 버전 CDN) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -27,7 +27,7 @@
       <button id="theme-toggle" class="icon-btn" aria-label="다크 모드 전환">🌙</button>
     </header>
 
-    <!-- 작성자 / 날짜 / 연동코드 카드 -->
+    <!-- 작성자 / 날짜 / 연동코드 카드 (공통 영역) -->
     <section class="meta-section card">
       <div class="meta-row">
         <div class="meta-col">
@@ -51,158 +51,206 @@
       </div>
     </section>
 
-    <!-- 미니 달력 (Habit Tracker) -->
-    <section class="calendar-section card">
-      <div class="calendar-top">
-        <div class="calendar-header">
-          <button type="button" id="prev-month-btn" class="cal-nav-btn">&lt;</button>
-          <h2 id="calendar-title">2026.09</h2>
-          <button type="button" id="next-month-btn" class="cal-nav-btn">&gt;</button>
-        </div>
-        <div class="calendar-stats">
-          <span class="stat-badge done" id="stat-done">작성: 0일</span>
-          <span class="stat-badge missed" id="stat-missed">미작성: 0일</span>
-        </div>
-      </div>
+    <!-- 🌟 탭 전환 버튼 바 🌟 -->
+    <nav class="tab-nav">
+      <button type="button" id="tab-btn-diary" class="tab-nav-btn active">📓 일기장</button>
+      <button type="button" id="tab-btn-meditation" class="tab-nav-btn">🕯️ 묵상/생각 기록</button>
+    </nav>
 
-      <div class="calendar-grid weekdays">
-        <div class="sun">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="sat">토</div>
-      </div>
-      <div id="calendar-days" class="calendar-grid days"></div>
-
-      <div class="calendar-legend">
-        <span class="legend-item"><span class="legend-mark done">✅</span> 작성 완료</span>
-        <span class="legend-item"><span class="legend-mark today">🔵</span> 오늘</span>
-        <span class="legend-item"><span class="legend-mark missed">▫️</span> 미작성</span>
-      </div>
-    </section>
-
-    <!-- 일기 폼 -->
-    <form id="diary-form" class="form-container">
-      <!-- Step 1: 스케줄 -->
-      <section class="card form-step">
-        <div class="step-card-header">
-          <span class="step-badge">🤍 step.1 스케줄</span>
-        </div>
-        
-        <!-- 오늘 일정 -->
-        <div class="schedule-block">
-          <div class="schedule-title-bar">
-            <span class="schedule-title">⏰ 오늘 (⭕️❌)</span>
-            <button type="button" id="import-yesterday-btn" class="import-plan-btn">🔄 어제 계획 불러오기</button>
+    <!-- ========================================== -->
+    <!-- [탭 1] 기존 일기장 화면 (원래 기능 100% 유지) -->
+    <!-- ========================================== -->
+    <div id="tab-diary-view">
+      <!-- 미니 달력 (Habit Tracker) -->
+      <section class="calendar-section card">
+        <div class="calendar-top">
+          <div class="calendar-header">
+            <button type="button" id="prev-month-btn" class="cal-nav-btn">&lt;</button>
+            <h2 id="calendar-title">2026.09</h2>
+            <button type="button" id="next-month-btn" class="cal-nav-btn">&gt;</button>
           </div>
-          <div id="today-schedule-list" class="schedule-items-container"></div>
-          <button type="button" id="add-today-row-btn" class="add-box-btn">+ 오늘 일정 추가</button>
-        </div>
-
-        <!-- 내일 일정 -->
-        <div class="schedule-block">
-          <div class="schedule-title-bar">
-            <span class="schedule-title">⏰ 내일</span>
+          <div class="calendar-stats">
+            <span class="stat-badge done" id="stat-done">작성: 0일</span>
+            <span class="stat-badge missed" id="stat-missed">미작성: 0일</span>
           </div>
-          <div id="tomorrow-schedule-list" class="schedule-items-container"></div>
-          <button type="button" id="add-tomorrow-row-btn" class="add-box-btn">+ 내일 일정 추가</button>
+        </div>
+
+        <div class="calendar-grid weekdays">
+          <div class="sun">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="sat">토</div>
+        </div>
+        <div id="calendar-days" class="calendar-grid days"></div>
+
+        <div class="calendar-legend">
+          <span class="legend-item"><span class="legend-mark done">✅</span> 작성 완료</span>
+          <span class="legend-item"><span class="legend-mark today">🔵</span> 오늘</span>
+          <span class="legend-item"><span class="legend-mark missed">▫️</span> 미작성</span>
         </div>
       </section>
 
-      <!-- Step 2: 미디어 디톡스 -->
-      <section class="card form-step">
+      <!-- 일기 폼 -->
+      <form id="diary-form" class="form-container">
+        <!-- Step 1: 스케줄 -->
+        <section class="card form-step">
+          <div class="step-card-header">
+            <span class="step-badge">🤍 step.1 스케줄</span>
+          </div>
+          
+          <!-- 오늘 일정 -->
+          <div class="schedule-block">
+            <div class="schedule-title-bar">
+              <span class="schedule-title">⏰ 오늘 (⭕️❌)</span>
+              <button type="button" id="import-yesterday-btn" class="import-plan-btn">🔄 어제 계획 불러오기</button>
+            </div>
+            <div id="today-schedule-list" class="schedule-items-container"></div>
+            <button type="button" id="add-today-row-btn" class="add-box-btn">+ 오늘 일정 추가</button>
+          </div>
+
+          <!-- 내일 일정 -->
+          <div class="schedule-block">
+            <div class="schedule-title-bar">
+              <span class="schedule-title">⏰ 내일</span>
+            </div>
+            <div id="tomorrow-schedule-list" class="schedule-items-container"></div>
+            <button type="button" id="add-tomorrow-row-btn" class="add-box-btn">+ 내일 일정 추가</button>
+          </div>
+        </section>
+
+        <!-- Step 2: 미디어 디톡스 -->
+        <section class="card form-step">
+          <div class="step-card-header">
+            <span class="step-badge">🤍 step.2 미디어 디톡스</span>
+          </div>
+          <p class="sub-legend">▫️ 오늘 사용량</p>
+          <div class="input-block">
+            <label for="media-search">검색 :</label>
+            <input type="text" id="media-search">
+          </div>
+          <div class="input-block">
+            <label for="media-sns">커뮤니티, SNS, 유튜브 :</label>
+            <input type="text" id="media-sns">
+          </div>
+          <div class="input-block">
+            <label for="media-video">영상물 :</label>
+            <input type="text" id="media-video">
+          </div>
+          <div class="input-block">
+            <label for="media-etc">기타 :</label>
+            <input type="text" id="media-etc">
+          </div>
+        </section>
+
+        <!-- Step 3: 묵상 -->
+        <section class="card form-step">
+          <div class="step-card-header">
+            <span class="step-badge">🤍 step.3 묵상</span>
+          </div>
+          <div class="input-block">
+            <label for="meditation-chapter">🕯️ 성경 장</label>
+            <input type="text" id="meditation-chapter">
+          </div>
+          <div class="input-block">
+            <label for="meditation-content">와닿은 구절 &amp; 와닿은 이유 및 느낀점</label>
+            <textarea id="meditation-content" rows="4"></textarea>
+          </div>
+        </section>
+
+        <!-- Step 4: 신앙일기 -->
+        <section class="card form-step">
+          <div class="step-card-header">
+            <span class="step-badge">🤍 step.4 신앙일기</span>
+          </div>
+          <div class="input-block">
+            <label for="faith-emotion">• 오늘 느낀 감정의 종류</label>
+            <input type="text" id="faith-emotion">
+          </div>
+          <div class="input-block">
+            <label for="faith-situation">감정을 느낀 상황은 무엇인가요?</label>
+            <textarea id="faith-situation" rows="2"></textarea>
+          </div>
+          <div class="input-block">
+            <label for="faith-desire">나의 본심찾기 (나의 욕구:내가 원한 것)</label>
+            <textarea id="faith-desire" rows="2"></textarea>
+          </div>
+          <div class="input-block">
+            <label for="faith-lesson">이 일을 통해 하나님께서 내게 알려주시고 싶으신 것은 무엇이었을까? (하나님의 도우심, 깨달은 점)</label>
+            <textarea id="faith-lesson" rows="3"></textarea>
+          </div>
+          
+          <div class="sub-group">
+            <span class="sub-label">💛 감사한 점</span>
+            <input type="text" id="faith-gratitude-1" class="mb-sm">
+            <input type="text" id="faith-gratitude-2">
+          </div>
+
+          <div class="sub-group">
+            <span class="sub-label">🙏🏻 회개할 점</span>
+            <input type="text" id="faith-repent-1" class="mb-sm">
+            <input type="text" id="faith-repent-2">
+          </div>
+        </section>
+
+        <!-- Step 5: 기도문 -->
+        <section class="card form-step">
+          <div class="step-card-header">
+            <span class="step-badge">🤍 step.5 기도문</span>
+          </div>
+          <div class="input-block">
+            <textarea id="prayer-content" rows="4"></textarea>
+          </div>
+          <div class="fixed-scripture">
+            🧎🏻 시 62:1 나의 영혼이 잠잠히 하나님만 바람이여 나의 구원이 그에게서 나는도다
+          </div>
+        </section>
+
+        <!-- 분리된 하단 액션 버튼 -->
+        <div class="action-footer">
+          <button type="button" id="save-btn" class="save-btn">💾 저장하기</button>
+          <button type="button" id="copy-btn" class="copy-btn">📋 작성 완료 및 복사</button>
+          <button type="button" id="reset-btn" class="reset-btn">초기화</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- [탭 2] 새로 추가된 묵상/생각 기록 전용 화면 -->
+    <!-- ========================================== -->
+    <div id="tab-meditation-view" style="display: none;">
+      <!-- 묵상 작성/수정 폼 (평소엔 숨겨져 있다가 버튼 클릭 시 열림) -->
+      <section class="card" id="meditation-editor-card" style="display: none;">
         <div class="step-card-header">
-          <span class="step-badge">🤍 step.2 미디어 디톡스</span>
+          <span class="step-badge" id="meditation-form-title">✍️ 새 묵상/생각 기록하기</span>
         </div>
-        <p class="sub-legend">▫️ 오늘 사용량</p>
+        <input type="hidden" id="meditation-edit-id" value="">
         <div class="input-block">
-          <label for="media-search">검색 :</label>
-          <input type="text" id="media-search">
-        </div>
-        <div class="input-block">
-          <label for="media-sns">커뮤니티, SNS, 유튜브 :</label>
-          <input type="text" id="media-sns">
+          <label for="meditation-note-title">📌 제목</label>
+          <input type="text" id="meditation-note-title" placeholder="나중에 다시 꺼내볼 제목을 입력하세요">
         </div>
         <div class="input-block">
-          <label for="media-video">영상물 :</label>
-          <input type="text" id="media-video">
+          <label for="meditation-note-body">💭 묵상 및 생각 정리</label>
+          <textarea id="meditation-note-body" rows="6" placeholder="깊이 묵상한 내용이나 기억하고 싶은 생각을 자유롭게 기록하세요..."></textarea>
         </div>
-        <div class="input-block">
-          <label for="media-etc">기타 :</label>
-          <input type="text" id="media-etc">
+        <div class="meditation-form-actions">
+          <button type="button" id="meditation-save-btn" class="save-btn">💾 기록 저장</button>
+          <button type="button" id="meditation-cancel-btn" class="reset-btn">취소</button>
         </div>
       </section>
 
-      <!-- Step 3: 묵상 -->
-      <section class="card form-step">
-        <div class="step-card-header">
-          <span class="step-badge">🤍 step.3 묵상</span>
+      <!-- 저장된 묵상 목록 (다시 보기) -->
+      <section class="card">
+        <div class="meditation-list-header">
+          <span class="step-badge">📚 저장된 묵상 보관함</span>
+          <button type="button" id="open-meditation-form-btn" class="new-meditation-btn">+ 새 기록 쓰기</button>
         </div>
-        <div class="input-block">
-          <label for="meditation-chapter">🕯️ 성경 장</label>
-          <input type="text" id="meditation-chapter">
-        </div>
-        <div class="input-block">
-          <label for="meditation-content">와닿은 구절 &amp; 와닿은 이유 및 느낀점</label>
-          <textarea id="meditation-content" rows="4"></textarea>
+        <p class="sub-legend">제목을 누르면 작성했던 내용을 언제든 다시 펼쳐볼 수 있습니다.</p>
+        <div id="meditation-notes-list" class="meditation-list-container">
+          <!-- 자바스크립트로 목록이 렌더링됩니다 -->
         </div>
       </section>
-
-      <!-- Step 4: 신앙일기 -->
-      <section class="card form-step">
-        <div class="step-card-header">
-          <span class="step-badge">🤍 step.4 신앙일기</span>
-        </div>
-        <div class="input-block">
-          <label for="faith-emotion">• 오늘 느낀 감정의 종류</label>
-          <input type="text" id="faith-emotion">
-        </div>
-        <div class="input-block">
-          <label for="faith-situation">감정을 느낀 상황은 무엇인가요?</label>
-          <textarea id="faith-situation" rows="2"></textarea>
-        </div>
-        <div class="input-block">
-          <label for="faith-desire">나의 본심찾기 (나의 욕구:내가 원한 것)</label>
-          <textarea id="faith-desire" rows="2"></textarea>
-        </div>
-        <div class="input-block">
-          <label for="faith-lesson">이 일을 통해 하나님께서 내게 알려주시고 싶으신 것은 무엇이었을까? (하나님의 도우심, 깨달은 점)</label>
-          <textarea id="faith-lesson" rows="3"></textarea>
-        </div>
-        
-        <div class="sub-group">
-          <span class="sub-label">💛 감사한 점</span>
-          <input type="text" id="faith-gratitude-1" class="mb-sm">
-          <input type="text" id="faith-gratitude-2">
-        </div>
-
-        <div class="sub-group">
-          <span class="sub-label">🙏🏻 회개할 점</span>
-          <input type="text" id="faith-repent-1" class="mb-sm">
-          <input type="text" id="faith-repent-2">
-        </div>
-      </section>
-
-      <!-- Step 5: 기도문 -->
-      <section class="card form-step">
-        <div class="step-card-header">
-          <span class="step-badge">🤍 step.5 기도문</span>
-        </div>
-        <div class="input-block">
-          <textarea id="prayer-content" rows="4"></textarea>
-        </div>
-        <div class="fixed-scripture">
-          🧎🏻 시 62:1 나의 영혼이 잠잠히 하나님만 바람이여 나의 구원이 그에게서 나는도다
-        </div>
-      </section>
-
-      <!-- 분리된 하단 액션 버튼 -->
-      <div class="action-footer">
-        <button type="button" id="save-btn" class="save-btn">💾 저장하기</button>
-        <button type="button" id="copy-btn" class="copy-btn">📋 작성 완료 및 복사</button>
-        <button type="button" id="reset-btn" class="reset-btn">초기화</button>
-      </div>
-    </form>
+    </div>
   </div>
 
   <div id="toast" class="toast">알림</div>
 
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>
